@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         red = QtGui.QColor(255, 0, 0)
-        purple = QtGui.QColor(70, 20, 144)
+        purple = QtGui.QColor(70, 20, 140)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(720, 410)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -46,7 +46,7 @@ class Ui_MainWindow(object):
         self.label_table.setGeometry(QtCore.QRect(200, 0, 485, 351))
         self.label_table.setObjectName("label_table")
         self.label_table.setColumnCount(10)
-        self.label_table.setHorizontalHeaderLabels(("Name", "Address", "Address2", "City", "State", "Zip", "Country",
+        self.label_table.setHorizontalHeaderLabels(("Name", "Address", "Address 2", "City", "State", "Zip", "Country",
                                                     "Invoice", "Weight", "Signature"))
         label_header = self.label_table.horizontalHeader()
         for i in range(10, 1):
