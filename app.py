@@ -13,7 +13,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        red = QtGui.QColor(255,0,0)
+        red = QtGui.QColor(255, 0, 0)
+        purple = QtGui.QColor(70, 20, 144)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(720, 410)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -22,6 +23,9 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setMaximumSize(QtCore.QSize(720, 410))
+        p = MainWindow.palette()
+        p.setColor(MainWindow.backgroundRole(), purple)
+        MainWindow.setPalette(p)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
@@ -107,6 +111,7 @@ class Ui_MainWindow(object):
         self.title_label.setFont(font)
         self.title_label.setAlignment(QtCore.Qt.AlignCenter)
         self.title_label.setObjectName("title_label")
+        self.title_label.setStyleSheet("color: white;")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
