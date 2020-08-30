@@ -1,6 +1,6 @@
 import requests
 import json
-import sys
+
 
 class Tracker:
     """
@@ -9,7 +9,6 @@ class Tracker:
 
     def __init__(self, tracking_list = []):
         self.tracking_list = tracking_list
-
 
     def track(self):
         """
@@ -21,7 +20,6 @@ class Tracker:
 
         for tracking_number in self.tracking_list:
 
-            #
             info = requests.post('https://www.fedex.com/trackingCal/track',
             data={
             'data': json.dumps({
@@ -53,7 +51,7 @@ class Tracker:
             tracked_list.append(status)
 
         return tracked_list
-            #print(f'{tracking_number}-{status}')
+
 
 if __name__ == '__main__':
     main()
