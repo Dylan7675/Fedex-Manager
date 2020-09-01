@@ -10,6 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from pathlib import Path
 
 
 class Ui_MainWindow(QWidget):
@@ -127,8 +128,11 @@ class Ui_MainWindow(QWidget):
     # File Browser Signal Function
     def browse_file_signal(self):
 
-        print("File browse button pressed")
+        self.file_path = Path(QtWidgets.QFileDialog.getOpenFileName(self, 'Select files',
+                                                            '/', "CSV file (*.csv)")[0])
 
+        if self.file_path.name:
+            self.file_label.setText(self.file_path.name)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
