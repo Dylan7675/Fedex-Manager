@@ -9,9 +9,10 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
 
-class Ui_MainWindow(object):
+class Ui_MainWindow(QWidget):
     def setupUi(self, MainWindow):
         red = QtGui.QColor(255, 0, 0)
         purple = QtGui.QColor(70, 20, 140)
@@ -116,9 +117,18 @@ class Ui_MainWindow(object):
         self.title_label.setStyleSheet("color: white;")
         MainWindow.setCentralWidget(self.centralwidget)
 
+        # File Browse Signal Call
+        self.browse_button.clicked.connect(self.browse_file_signal)
+
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    # File Browser Signal Function
+    def browse_file_signal(self):
+
+        print("File browse button pressed")
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
