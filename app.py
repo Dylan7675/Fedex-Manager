@@ -41,6 +41,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setMovable(True)
         self.tabWidget.setTabBarAutoHide(False)
         self.tabWidget.setObjectName("tabWidget")
+        self.tabWidget.setStyleSheet("background-color: white;")
         self.label_tab = QtWidgets.QWidget()
         self.label_tab.setObjectName("label_tab")
         self.label_table = QtWidgets.QTableWidget(self.label_tab)
