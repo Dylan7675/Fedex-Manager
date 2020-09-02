@@ -14,8 +14,6 @@ class Formatter:
 
         self.csv_path = csv_path
 
-
-
         # Dictionary keys from usaddress module
         self.address1_keys = ['AddressNumber', 'StreetNamePreDirectional', 'StreetName',
                               'StreetNamePostType', 'StreetNamePostDirectional']
@@ -59,7 +57,7 @@ class Formatter:
                     address1 = " ".join([address1, parsed_address[k]])
 
             # Address should never be left blank
-            if not self.address1:
+            if not address1:
                 print(f"Validate the Address of {name}")
 
             # Combining address2 OccupancyType and OccupancyIdentifier
@@ -75,7 +73,7 @@ class Formatter:
                 print(f"Validate the City of {name}")
             try:
                 state = parsed_address['StateName'].capitalize()
-                if state in US_states.keys()
+                if state in US_states.keys():
                     state = US_states[state].upper()
             except KeyError:
                 state = "VALIDATE STATE"
