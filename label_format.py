@@ -9,7 +9,9 @@ Example: Make this script a callable function from main.app taking path as input
 
 class Formatter:
 
-    def __init__(self):
+    def __init__(self, csv_path):
+
+        self.csv_path = csv_path
 
         # Dictionary keys from usaddress module
         self.address1_keys = ['AddressNumber', 'StreetNamePreDirectional', 'StreetName',
@@ -26,13 +28,13 @@ class Formatter:
                                          "City", "State", "Zip", "Phone", "CountryCode",
                                          "Weight", "Invoice", "Signature"])
 
-    def parse_csv(self, csv_path):
+    def parse_csv(self):
         """
         :param csv_path:
         :return: fedex_df
         """
 
-        dataset = pd.read_csv(csv_path, names=["Name", "Invoice", "Address", "Phone"])
+        dataset = pd.read_csv(self.csv_path, names=["Name", "Invoice", "Address", "Phone"])
 
         # Iterate over rows of user submissions
         for ind in dataset.index:
@@ -81,7 +83,7 @@ class Formatter:
                        "Address1": address1,
                        "Address2": address2,
                        "City": city,
-                       "State": state,
+                       "State": state.upper(),
                        "Zip": zip_code,
                        "Phone": phone,
                        "CountryCode": self.country,
@@ -92,7 +94,7 @@ class Formatter:
 
             self.fedex_df = self.fedex_df.append(new_row, ignore_index=True)
 
-            return self.fedex_df
+        return self.fedex_df
 
     def export_csv(self, df):
 

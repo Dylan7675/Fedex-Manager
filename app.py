@@ -11,6 +11,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from pathlib import Path
+from label_format import Formatter
+import pandas as pd
 
 
 class Ui_MainWindow(QWidget):
@@ -49,9 +51,9 @@ class Ui_MainWindow(QWidget):
         self.label_table = QtWidgets.QTableWidget(self.label_tab)
         self.label_table.setGeometry(QtCore.QRect(200, 0, 585, 351))
         self.label_table.setObjectName("label_table")
-        self.label_table.setColumnCount(10)
-        self.label_table.setHorizontalHeaderLabels(("Name", "Address", "Address 2", "City", "State", "Zip", "Country",
-                                                    "Invoice", "Weight", "Signature"))
+        self.label_table.setColumnCount(11)
+        self.label_table.setHorizontalHeaderLabels(("Name", "Address", "Address 2", "City", "State", "Zip", "Phone",
+                                                    "Country", "Weight", "Invoice", "Signature"))
         label_header = self.label_table.horizontalHeader()
         for i in range(10, 1):
             label_header.setSectionResizeMode(i, QtWidgets.QHeaderView.ResizeToContents)
@@ -132,7 +134,22 @@ class Ui_MainWindow(QWidget):
                                                             '/', "CSV file (*.csv)")[0])
 
         if self.file_path.name:
-            self.file_label.setText(self.file_path.name)
+
+            self.data_import = Formatter(self.file_path)
+            try:
+                self.import_df = self.data_import.parse_csv()
+                self.update_label_table()
+                self.file_label.setText(self.file_path.name)
+            except Exception as e:
+                self.log_box.setText("Incompatible data!\n\nPlease verify the import data.")
+
+    def update_label_table(self):
+
+        df_array = self.import_df.values
+        self.label_table.setRowCount(self.import_df.shape[0])
+        for row in range(self.import_df.shape[0]):
+            for col in range(self.import_df.shape[1]):
+                self.label_table.setItem(row, col, QtWidgets.QTableWidgetItem(str(df_array[row, col])))
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
