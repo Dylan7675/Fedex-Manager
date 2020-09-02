@@ -1,5 +1,6 @@
 import pandas as pd
 import usaddress
+from states import US_states
 
 """
 TODO: Change reading a specific csv to reading a file path from fileDialog
@@ -12,6 +13,8 @@ class Formatter:
     def __init__(self, csv_path):
 
         self.csv_path = csv_path
+
+
 
         # Dictionary keys from usaddress module
         self.address1_keys = ['AddressNumber', 'StreetNamePreDirectional', 'StreetName',
@@ -55,6 +58,10 @@ class Formatter:
                 if k in parsed_address.keys():
                     address1 = " ".join([address1, parsed_address[k]])
 
+            # Address should never be left blank
+            if not self.address1:
+                print(f"Validate the Address of {name}")
+
             # Combining address2 OccupancyType and OccupancyIdentifier
             for k in self.address2_keys:
                 if k in parsed_address.keys():
@@ -62,12 +69,14 @@ class Formatter:
 
             # Validate user submitted city, state, and zip
             try:
-                city = parsed_address['PlaceName']
+                city = parsed_address['PlaceName'].capitalize()
             except KeyError:
                 city = "VALIDATE CITY"
                 print(f"Validate the City of {name}")
             try:
-                state = parsed_address['StateName']
+                state = parsed_address['StateName'].capitalize()
+                if state in US_states.keys()
+                    state = US_states[state].upper()
             except KeyError:
                 state = "VALIDATE STATE"
                 print(f"Validate the State of {name}")
