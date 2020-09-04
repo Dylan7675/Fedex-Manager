@@ -123,12 +123,19 @@ class Ui_MainWindow(QWidget):
         # File Browse Signal Call
         self.browse_button.clicked.connect(self.browse_file_signal)
 
+        # Table Changed Signal Call
+        self.label_table.itemChanged.connect(self.update_label_table_dataset)
+
+        # Export File Signal Call
+        self.export_button.clicked.connect(self.export_label_table)
+        self.export_button.blockSignals(True)
+
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    # File Browser Signal Function
     def browse_file_signal(self):
+        """ File Browser Signal Function """
 
         self.file_path = Path(QtWidgets.QFileDialog.getOpenFileName(self, 'Select files',
                                                             '/', "CSV file (*.csv)")[0])
@@ -140,16 +147,31 @@ class Ui_MainWindow(QWidget):
                 self.import_df = self.data_import.parse_csv()
                 self.update_label_table()
                 self.file_label.setText(self.file_path.name)
+                self.export_button.blockSignals(False)
             except Exception as e:
-                self.log_box.setText("Incompatible data!\n\nPlease verify the import data.")
+                self.log_box.setText(f"Incompatible data!\n\nPlease verify the import data.")
 
     def update_label_table(self):
+        """ Updates the label table with data from df """
 
-        df_array = self.import_df.values
+        self.label_table.blockSignals(True)
+        self.df_array = self.import_df.values
         self.label_table.setRowCount(self.import_df.shape[0])
         for row in range(self.import_df.shape[0]):
             for col in range(self.import_df.shape[1]):
-                self.label_table.setItem(row, col, QtWidgets.QTableWidgetItem(str(df_array[row, col])))
+                self.label_table.setItem(row, col, QtWidgets.QTableWidgetItem(str(self.df_array[row, col])))
+        self.label_table.blockSignals(False)
+
+    def update_label_table_dataset(self, item):
+        """ Listens for table edits and updates df_array dataset """
+
+        self.df_array[item.row(), item.column()] = item.text()
+
+    def export_label_table(self):
+        """Reads out edited data from the table and exports to file"""
+
+        self.log_box.setText("Export Signal")
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
