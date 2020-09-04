@@ -67,12 +67,15 @@ class Formatter:
 
             # Validate user submitted city, state, and zip
             try:
-                city = parsed_address['PlaceName'].capitalize()
+                city = " ".join([name.capitalize() for name in
+                                 parsed_address['PlaceName'].split()])
             except KeyError:
                 city = "VALIDATE CITY"
                 print(f"Validate the City of {name}")
             try:
-                state = parsed_address['StateName'].capitalize()
+                state = " ".join([name.capitalize() for name in
+                                  parsed_address['StateName'].split()])
+
                 if state in US_states.keys():
                     state = US_states[state].upper()
             except KeyError:
