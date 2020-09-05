@@ -170,8 +170,14 @@ class Ui_MainWindow(QWidget):
     def export_label_table(self):
         """Reads out edited data from the table and exports to file"""
 
-        self.log_box.setText("Export Signal")
+        export_df = pd.DataFrame(data=self.df_array,
+                                 columns=[col for col in self.import_df.columns])
 
+        name_path = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File')[0]
+        #file_name = Path(name_path[0]).name
+
+        if name_path:
+            export_df.to_csv(name_path, index=False)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
