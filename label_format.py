@@ -1,6 +1,7 @@
 import pandas as pd
 import usaddress
 from states import US_states
+import re
 
 """
 TODO: Change reading a specific csv to reading a file path from fileDialog
@@ -72,15 +73,21 @@ class Formatter:
             except KeyError:
                 city = "VALIDATE CITY"
                 print(f"Validate the City of {name}")
+
             try:
+
                 state = " ".join([name.capitalize() for name in
                                   parsed_address['StateName'].split()])
 
-                if state in US_states.keys():
-                    state = US_states[state].upper()
+                # Regex validate special characters from State
+                state = state_validator(state)
+
+                state = US_states[state].upper()
+
             except KeyError:
                 state = "VALIDATE STATE"
                 print(f"Validate the State of {name}")
+
             try:
                 zip_code = parsed_address['ZipCode']
             except KeyError:
@@ -106,9 +113,16 @@ class Formatter:
 
         return self.fedex_df
 
-    def export_csv(self, df):
 
-        df.to_csv("fedex_bulk_print.csv", index=False)
+def state_validator(state_name):
+    """ Removes any special characters from state name """
+
+    if not re.match('^[a-zA-Z_ ]+$', state_name):
+        for char in state_name:
+            if not re.match('^[a-zA-Z_ ]+$', char):
+                fixed_state = state_name.replace(char, "")
+        return fixed_state
+    return state_name
 
 
 if __name__ == '__main__':
