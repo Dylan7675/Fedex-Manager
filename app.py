@@ -148,6 +148,10 @@ class Ui_MainWindow(QWidget):
                 self.update_label_table()
                 self.file_label.setText(self.file_path.name)
                 self.export_button.blockSignals(False)
+
+                if self.data_import.logs:
+                    self.log_box.setText("".join(self.data_import.logs))
+
             except Exception as e:
                 self.log_box.setText(f"Incompatible data!\n\nPlease verify the import data.")
 
@@ -174,7 +178,6 @@ class Ui_MainWindow(QWidget):
                                  columns=[col for col in self.import_df.columns])
 
         name_path = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File')[0]
-        #file_name = Path(name_path[0]).name
 
         if name_path:
             export_df.to_csv(name_path, index=False)

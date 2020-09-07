@@ -26,6 +26,8 @@ class Formatter:
         self.country = "US"
         self.signature = 4  # ASR = 4
 
+        self.logs = []
+
         self.fedex_df = pd.DataFrame(columns=["FullName", "Address1", "Address2",
                                          "City", "State", "Zip", "Phone", "CountryCode",
                                          "Weight", "Invoice", "Signature"])
@@ -59,7 +61,7 @@ class Formatter:
 
             # Address should never be left blank
             if not address1:
-                print(f"Validate the Address of {name}")
+                self.logs.append(f"Validate the Address of {name}\n\n")
 
             # Combining address2 OccupancyType and OccupancyIdentifier
             for k in self.address2_keys:
@@ -72,7 +74,7 @@ class Formatter:
                                  parsed_address['PlaceName'].split()])
             except KeyError:
                 city = "VALIDATE CITY"
-                print(f"Validate the City of {name}")
+                self.logs.append(f"Validate the City of {name}\n\n")
 
             try:
 
@@ -86,13 +88,13 @@ class Formatter:
 
             except KeyError:
                 state = "VALIDATE STATE"
-                print(f"Validate the State of {name}")
+                self.logs.append(f"Validate the State of {name}\n\n")
 
             try:
                 zip_code = parsed_address['ZipCode']
             except KeyError:
                 zip_code = "VALIDATE ZIP"
-                print(f"Validate the Zip of {name}")
+                self.logs.append(f"Validate the Zip of {name}\n\n")
 
             # Structure data into new df row
             new_row = {
