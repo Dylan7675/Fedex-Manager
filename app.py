@@ -54,9 +54,8 @@ class Ui_MainWindow(QWidget):
         self.label_table.setColumnCount(11)
         self.label_table.setHorizontalHeaderLabels(("Name", "Address", "Address 2", "City", "State", "Zip", "Phone",
                                                     "Country", "Weight", "Invoice", "Signature"))
-        label_header = self.label_table.horizontalHeader()
-        for i in range(10, 1):
-            label_header.setSectionResizeMode(i, QtWidgets.QHeaderView.ResizeToContents)
+
+        self.label_table.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
         self.label_table.setRowCount(0)
         self.file_label = QtWidgets.QLabel(self.label_tab)
         self.file_label.setGeometry(QtCore.QRect(10, 0, 181, 31))
@@ -124,7 +123,7 @@ class Ui_MainWindow(QWidget):
         self.browse_button.clicked.connect(self.browse_file_signal)
 
         # Table Changed Signal Call
-        self.label_table.itemChanged.connect(self.update_label_table_dataset)
+        self.label_table.itemChanged.connect(self.edit_label_table_dataset)
 
         # Export File Signal Call
         self.export_button.clicked.connect(self.export_label_table)
@@ -146,6 +145,7 @@ class Ui_MainWindow(QWidget):
             try:
                 self.import_df = self.data_import.parse_csv()
                 self.update_label_table()
+                self.label_table.resizeColumnsToContents()
                 self.file_label.setText(self.file_path.name)
                 self.export_button.blockSignals(False)
 
@@ -166,10 +166,11 @@ class Ui_MainWindow(QWidget):
                 self.label_table.setItem(row, col, QtWidgets.QTableWidgetItem(str(self.df_array[row, col])))
         self.label_table.blockSignals(False)
 
-    def update_label_table_dataset(self, item):
+    def edit_label_table_dataset(self, item):
         """ Listens for table edits and updates df_array dataset """
 
         self.df_array[item.row(), item.column()] = item.text()
+        self.label_table.resizeColumnsToContents()
 
     def export_label_table(self):
         """Reads out edited data from the table and exports to file"""
