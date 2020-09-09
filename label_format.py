@@ -84,7 +84,8 @@ class Formatter:
                 # Regex validate special characters from State
                 state = state_validator(state)
 
-                state = US_states[state].upper()
+                if state in US_states.keys():
+                    state = US_states[state].upper()
 
             except KeyError:
                 state = "VALIDATE STATE"
