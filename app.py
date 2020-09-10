@@ -9,29 +9,31 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QMainWindow
 from pathlib import Path
 from label_format import Formatter
 import pandas as pd
 
 
-class Ui_MainWindow(QWidget):
-    def setupUi(self, MainWindow):
+class Ui_MainWindow(QMainWindow):
+
+    def __init__(self):
+        QMainWindow.__init__(self)
         red = QtGui.QColor(255, 0, 0)
         purple = QtGui.QColor(70, 20, 140)
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(820, 410)
+        self.setObjectName("MainWindow")
+        self.resize(820, 410)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
-        MainWindow.setSizePolicy(sizePolicy)
-        MainWindow.setMaximumSize(QtCore.QSize(820, 410))
-        MainWindow.setMinimumSize(QtCore.QSize(820, 410))
-        p = MainWindow.palette()
-        p.setColor(MainWindow.backgroundRole(), purple)
-        MainWindow.setPalette(p)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
+        self.setSizePolicy(sizePolicy)
+        self.setMaximumSize(QtCore.QSize(820, 410))
+        self.setMinimumSize(QtCore.QSize(820, 410))
+        p = self.palette()
+        p.setColor(self.backgroundRole(), purple)
+        self.setPalette(p)
+        self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setGeometry(QtCore.QRect(0, 50, 811, 351))
@@ -117,21 +119,28 @@ class Ui_MainWindow(QWidget):
         self.title_label.setAlignment(QtCore.Qt.AlignCenter)
         self.title_label.setObjectName("title_label")
         self.title_label.setStyleSheet("color: white;")
-        MainWindow.setCentralWidget(self.centralwidget)
+        self.setCentralWidget(self.centralwidget)
+        self.activated_widget = None
+
+        # Initiallzing clipboard
+        self.clip = QtWidgets.QApplication.clipboard()
 
         # File Browse Signal Call
+        self.browse_button.clicked.connect(self.active_widget)
         self.browse_button.clicked.connect(self.browse_file_signal)
 
         # Table Changed Signal Call
         self.label_table.itemChanged.connect(self.edit_label_table_dataset)
+        self.label_table.itemEntered.connect(self.active_widget)
 
         # Export File Signal Call
+        self.export_button.clicked.connect(self.active_widget)
         self.export_button.clicked.connect(self.export_label_table)
         self.export_button.blockSignals(True)
 
-        self.retranslateUi(MainWindow)
+        self.retranslateUi()
         self.tabWidget.setCurrentIndex(0)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(self)
 
     def browse_file_signal(self):
         """ File Browser Signal Function """
@@ -173,7 +182,7 @@ class Ui_MainWindow(QWidget):
         self.label_table.resizeColumnsToContents()
 
     def export_label_table(self):
-        """Reads out edited data from the table and exports to file"""
+        """ Reads out edited data from the table and exports to file """
 
         export_df = pd.DataFrame(data=self.df_array,
                                  columns=[col for col in self.import_df.columns])
@@ -183,9 +192,31 @@ class Ui_MainWindow(QWidget):
         if name_path:
             export_df.to_csv(name_path, index=False)
 
-    def retranslateUi(self, MainWindow):
+    def keyPressEvent(self, e):
+        """ Copy Event """
+
+        if e.modifiers() & QtCore.Qt.ControlModifier:
+            if e.key() == QtCore.Qt.Key_C:
+                if isinstance(self.activated_widget, QtWidgets.QTableWidget):
+                    selected = self.activated_widget.selectedRanges()
+                    s = ""
+                    for r in range(selected[0].topRow(), selected[0].bottomRow() + 1):
+                        for c in range(selected[0].leftColumn(), selected[0].rightColumn() + 1):
+                            try:
+                                s += str(self.activated_widget.item(r, c).text()) + "\t"
+                            except AttributeError:
+                                s += "\t"
+                        s = s[:-1] + "\n"  # eliminate last '\t'
+                    self.clip.setText(s)
+        if e.key() == QtCore.Qt.Key_F5:
+            self.close()
+
+    def active_widget(self):
+        self.activated_widget = self.sender()
+
+    def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Fedex Manager"))
+        self.setWindowTitle(_translate("MainWindow", "Fedex Manager"))
         self.file_label.setText(_translate("MainWindow", "File Name"))
         self.browse_button.setText(_translate("MainWindow", "Browse..."))
         self.label.setText(_translate("MainWindow", "Log Output"))
@@ -197,11 +228,10 @@ class Ui_MainWindow(QWidget):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.track_tab), _translate("MainWindow", "Batch Tracking"))
         self.title_label.setText(_translate("MainWindow", "Fedex Manager"))
 
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    App = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
-    ui.setupUi(App)
-    App.show()
+    ui.show()
     sys.exit(app.exec_())
