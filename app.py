@@ -126,7 +126,6 @@ class Ui_MainWindow(QMainWindow):
         self.clip = QtWidgets.QApplication.clipboard()
 
         # File Browse Signal Call
-        self.browse_button.clicked.connect(self.active_widget)
         self.browse_button.clicked.connect(self.browse_file_signal)
 
         # Table Changed Signal Call
@@ -139,7 +138,6 @@ class Ui_MainWindow(QMainWindow):
         self.export_button.blockSignals(True)
 
         # Expoer Track Shipments Call
-        self.tracking_button.clicked.connect(self.active_widget)
         self.tracking_button.clicked.connect(self.track_shipments_signal)
 
 
