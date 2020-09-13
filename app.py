@@ -138,6 +138,11 @@ class Ui_MainWindow(QMainWindow):
         self.export_button.clicked.connect(self.export_label_table)
         self.export_button.blockSignals(True)
 
+        # Expoer Track Shipments Call
+        self.tracking_button.clicked.connect(self.active_widget)
+        self.tracking_button.clicked.connect(self.track_shipments_signal)
+
+
         self.retranslateUi()
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(self)
@@ -163,6 +168,11 @@ class Ui_MainWindow(QMainWindow):
 
             except Exception as e:
                 self.log_box.setText(f"Incompatible data!\n\nPlease verify the import data.")
+
+
+    def track_shipments_signal(self):
+        print("track signal call")
+
 
     def update_label_table(self):
         """ Updates the label table with data from df """
