@@ -7,6 +7,7 @@ import datetime
 import binascii
 import sys
 import serial
+import serial.tools.list_ports
 from typing import Dict
 
 class Configuration:
@@ -23,6 +24,14 @@ class Configuration:
                                  use_test_server=True)
 
         self.shipper_data = config['Shipper']
+
+        # Printer Config
+        ports = list(serial.tools.list_ports.comports())
+        for p in ports:
+            if "printer" in p.description or "Arduino" in p.description:
+                self.com = p.device
+
+        self.baud = '9600'
 
 class Shipment(Configuration):
 
@@ -153,13 +162,13 @@ class Shipment(Configuration):
 
         print(f'{self.track_id} Created')
 
+        ascii_label_data = self.shipment.response.CompletedShipmentDetail.CompletedPackageDetails[0].Label.Parts[0].Image
+        self.label_binary_data = binascii.a2b_base64(ascii_label_data)
+
     def label_2pdf(self):
 
         # Making the label
         if self.shipment:
-
-            ascii_label_data = self.shipment.response.CompletedShipmentDetail.CompletedPackageDetails[0].Label.Parts[0].Image
-            self.label_binary_data = binascii.a2b_base64(ascii_label_data)
 
             # Writing label to pdf
             out_path = f'{self.track_id}.{self.GENERATE_IMAGE_TYPE.lower()}'
@@ -171,7 +180,7 @@ class Shipment(Configuration):
         # Print Label to Serial Printer
         if self.label_binary_data:
 
-            label_printer = serial.Serial(0)
+            label_printer = serial.Serial('COM1')
             print("SELECTED SERIAL PORT: "+ label_printer.portstr)
             label_printer.write(self.label_binary_data)
             label_printer.close()
