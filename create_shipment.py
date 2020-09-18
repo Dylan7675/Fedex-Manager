@@ -28,10 +28,10 @@ class Configuration:
         # Printer Config
         ports = list(serial.tools.list_ports.comports())
         for p in ports:
-            if "printer" in p.description or "Arduino" in p.description:
-                self.com = p.device
+            if "printer" in p.description or "Printer" in p.description:
+                self.device = p.device
 
-        self.baud = '9600'
+        #self.baud = '9600'
 
 class Shipment(Configuration):
 
@@ -80,7 +80,7 @@ class Shipment(Configuration):
                                                 self.shipper_data['Zip']
 
         self.shipment.RequestedShipment.Shipper.Address.CountryCode = \
-                                                self.shipper_data['Country']
+                                                self.shipper_data['CountryCode']
 
         self.shipment.RequestedShipment.Recipient.Contact.PersonName = \
                                                 self.recipient_data['FullName']
@@ -102,7 +102,7 @@ class Shipment(Configuration):
                                                 self.recipient_data['Zip']
 
         self.shipment.RequestedShipment.Recipient.Address.CountryCode = \
-                                                self.recipient_data['Country']
+                                                self.recipient_data['CountryCode']
 
         self.shipment.RequestedShipment.EdtRequestType = 'NONE'
 
@@ -180,7 +180,7 @@ class Shipment(Configuration):
         # Print Label to Serial Printer
         if self.label_binary_data:
 
-            label_printer = serial.Serial('COM1')
+            label_printer = serial.Serial(self.device)
             print("SELECTED SERIAL PORT: "+ label_printer.portstr)
             label_printer.write(self.label_binary_data)
             label_printer.close()

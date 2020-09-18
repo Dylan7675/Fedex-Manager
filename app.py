@@ -14,6 +14,7 @@ from pathlib import Path
 from label_format import Formatter
 import pandas as pd
 import requests
+from create_shipment import Configuration, Shipment
 
 
 class Ui_MainWindow(QMainWindow):
@@ -141,9 +142,13 @@ class Ui_MainWindow(QMainWindow):
         self.export_button.clicked.connect(self.export_label_table)
         self.export_button.blockSignals(True)
 
-        # Expoer Track Shipments Call
-        self.tracking_button.clicked.connect(self.track_shipments_signal)
+        # Print Label Signal Call
+        self.print_button.clicked.connect(self.active_widget)
+        self.print_button.clicked.connect(self.print_labels)
+        self.print_button.blockSignals(True)
 
+        # Export Track Shipments Call
+        self.tracking_button.clicked.connect(self.track_shipments_signal)
 
         self.retranslateUi()
         self.tabWidget.setCurrentIndex(0)
@@ -159,11 +164,13 @@ class Ui_MainWindow(QMainWindow):
 
             self.data_import = Formatter(self.file_path)
             try:
+                self.log_box.setText("Double Check for Accuracy")
                 self.import_df = self.data_import.parse_csv()
                 self.update_label_table()
                 self.label_table.resizeColumnsToContents()
                 self.file_label.setText(self.file_path.name)
                 self.export_button.blockSignals(False)
+                self.print_button.blockSignals(False)
 
                 if self.data_import.logs:
                     self.log_box.setText("".join(self.data_import.logs))
@@ -192,6 +199,27 @@ class Ui_MainWindow(QMainWindow):
 
         self.df_array[item.row(), item.column()] = item.text()
         self.label_table.resizeColumnsToContents()
+
+    def print_labels(self):
+
+        self.print_button.blockSignals(True)
+        self.log_box.setText("Printing Labels...")
+
+        export_df = pd.DataFrame(data=self.df_array,
+                                 columns=[col for col in self.import_df.columns])
+
+        recipient_dic = export_df.T.to_dict()
+
+        for key in recipient_dic.keys():
+            try:
+                recipient = recipient_dic[key]
+                shipment = Shipment(recipient)
+                shipment.create_shipment()
+                shipment.label_2pdf()
+                # shipment.print_label()
+            except Exception as e:
+                self.log_box.setText(self.log_box.toPlainText() +
+                            f"\n\nUnable to print for {recipient['FullName']}")
 
     def export_label_table(self):
         """ Reads out edited data from the table and exports to file """
