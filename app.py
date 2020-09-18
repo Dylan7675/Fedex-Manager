@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import QWidget, QMainWindow
 from pathlib import Path
 from label_format import Formatter
 import pandas as pd
+import requests
 
 
 class Ui_MainWindow(QMainWindow):
@@ -195,7 +196,8 @@ class Ui_MainWindow(QMainWindow):
         export_df = pd.DataFrame(data=self.df_array,
                                  columns=[col for col in self.import_df.columns])
 
-        name_path = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File')[0]
+        name_path = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',
+                                        "label_export", "CSV file (*.csv)")[0]
 
         if name_path:
             export_df.to_csv(name_path, index=False)
