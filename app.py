@@ -205,10 +205,11 @@ class Ui_MainWindow(QMainWindow):
         self.print_button.blockSignals(True)
         self.log_box.setText("Printing Labels...")
 
-        export_df = pd.DataFrame(data=self.df_array,
-                                 columns=[col for col in self.import_df.columns])
+        recipient_dic = pd.DataFrame(data=self.df_array,
+                                 columns=[col for col in
+                                 self.import_df.columns]).T.to_dict()
 
-        recipient_dic = export_df.T.to_dict()
+        #recipient_dic = export_df.T.to_dict()
 
         for key in recipient_dic.keys():
             try:

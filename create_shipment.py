@@ -9,6 +9,8 @@ import sys
 import serial
 import serial.tools.list_ports
 from typing import Dict
+from pathlib import Path
+import os
 
 class Configuration:
 
@@ -30,6 +32,16 @@ class Configuration:
         for p in ports:
             if "printer" in p.description or "Printer" in p.description:
                 self.device = p.device
+
+        # Label path
+        self.label_path = Path.cwd() / "labels"
+
+        if not os.path.exists(self.label_path):
+            try:
+                os.makedirs(self.label_path, 0o700)
+                print(self.label_path)
+            except ValueError:
+                print(ValueError)
 
         #self.baud = '9600'
 
@@ -153,25 +165,21 @@ class Shipment(Configuration):
         self.shipment.send_request()
 
         assert self.shipment.response
-        #print("HighestSeverity: {}".format(self.shipment.response.HighestSeverity))
-        #assert self.shipment.response.HighestSeverity == 'SUCCESS'
+
         self.track_id = \
             self.shipment.response.CompletedShipmentDetail.CompletedPackageDetails[0].TrackingIds[0].TrackingNumber
 
         assert self.track_id
-
-        print(f'{self.track_id} Created')
 
         ascii_label_data = self.shipment.response.CompletedShipmentDetail.CompletedPackageDetails[0].Label.Parts[0].Image
         self.label_binary_data = binascii.a2b_base64(ascii_label_data)
 
     def label_2pdf(self):
 
-        # Making the label
         if self.shipment:
 
             # Writing label to pdf
-            out_path = f'{self.track_id}.{self.GENERATE_IMAGE_TYPE.lower()}'
+            out_path = self.label_path / f'{self.track_id}.{self.GENERATE_IMAGE_TYPE.lower()}'
             with open(out_path, 'wb') as f:
                 f.write(self.label_binary_data)
 
@@ -181,7 +189,6 @@ class Shipment(Configuration):
         if self.label_binary_data:
 
             label_printer = serial.Serial(self.device)
-            print("SELECTED SERIAL PORT: "+ label_printer.portstr)
             label_printer.write(self.label_binary_data)
             label_printer.close()
 
