@@ -127,7 +127,11 @@ class Ui_MainWindow(QMainWindow):
         self.setCentralWidget(self.centralwidget)
         self.activated_widget = None
 
-        # Initiallzing clipboard
+        # Initializing tracking lists
+        self.tracking_list = []
+        self.tracking_status_list = []
+
+        # Initializing clipboard
         self.clip = QtWidgets.QApplication.clipboard()
 
         # File Browse Signal Call
@@ -181,6 +185,14 @@ class Ui_MainWindow(QMainWindow):
 
     def track_shipments_signal(self):
         print("track signal call")
+        #self.tracking_list = self.tracking_input_box.getText().split(",")
+
+        #if self.tracking_list:
+            #for index, tracking_number in enumerate(self.tracking_list, 1)
+                #self.tracking_status_list.append(Tracker.track(tracking_number))
+                #self.update_progressbar(index)
+
+            #update tracking table: Col 0 - Tracking Number ; Col 1 - Tracking Status
 
 
     def update_label_table(self):
@@ -209,8 +221,6 @@ class Ui_MainWindow(QMainWindow):
                                  columns=[col for col in
                                  self.import_df.columns]).T.to_dict()
 
-        #recipient_dic = export_df.T.to_dict()
-
         for key in recipient_dic.keys():
             try:
                 recipient = recipient_dic[key]
@@ -233,6 +243,10 @@ class Ui_MainWindow(QMainWindow):
 
         if name_path:
             export_df.to_csv(name_path, index=False)
+
+    def update_progressbar(self, index):
+        tracking_percent = (index/len(self.tracking_list))*100
+        self.tracking_progressBar.setValue(tracking_percent)
 
     def keyPressEvent(self, e):
         """ Copy Event """
