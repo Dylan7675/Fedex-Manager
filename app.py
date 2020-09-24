@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QWidget, QMainWindow
+from PyQt5.QtWidgets import QWidget, QMainWindow, QMenuBar
 from pathlib import Path
 from label_format import Formatter
 import pandas as pd
@@ -125,6 +125,18 @@ class Ui_MainWindow(QMainWindow):
         self.title_label.setObjectName("title_label")
         self.title_label.setStyleSheet("color: white;")
         self.setCentralWidget(self.centralwidget)
+
+        # Menu Bar
+        self.menu_bar = self.menuBar()
+        self.config_menu = self.menu_bar.addMenu("Config")
+        self.new_config_option = QtWidgets.QAction("New Config", self)
+        self.new_config_option.setShortcut("Ctrl+N")
+        self.new_config_option.triggered.connect(lambda: print("test")) # add new config signal
+        self.load_config_option = self.config_menu.addMenu("Load Config")
+        self.config_menu.addAction(self.new_config_option)
+        self.config_menu.addMenu(self.load_config_option)
+        # self.menu_bar.setNativeMenuBar(False)
+
         self.activated_widget = None
 
         # Initializing tracking lists
@@ -227,7 +239,7 @@ class Ui_MainWindow(QMainWindow):
                 shipment = Shipment(recipient)
                 shipment.create_shipment()
                 shipment.label_2pdf()
-                # shipment.print_label()
+                shipment.print_label()
             except Exception as e:
                 self.log_box.setText(self.log_box.toPlainText() +
                             f"\n\nUnable to print for {recipient['FullName']}")
@@ -247,6 +259,7 @@ class Ui_MainWindow(QMainWindow):
     def update_progressbar(self, index):
         tracking_percent = (index/len(self.tracking_list))*100
         self.tracking_progressBar.setValue(tracking_percent)
+        self.total_label.setText(f"Total Tracked: {index}")
 
     def keyPressEvent(self, e):
         """ Copy Event """
