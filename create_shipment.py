@@ -11,6 +11,7 @@ import serial.tools.list_ports
 from typing import Dict
 from pathlib import Path
 import os
+import subprocess
 
 class Configuration:
 
@@ -30,7 +31,7 @@ class Configuration:
         # Printer Config
         ports = list(serial.tools.list_ports.comports())
         for p in ports:
-            if "printer" in p.description or "Printer" in p.description:
+            if "printer" in p.description or "USB-Serial" in p.description:
                 self.device = p.device
 
         # Label path
@@ -128,7 +129,7 @@ class Shipment(Configuration):
         self.shipment.RequestedShipment.LabelSpecification.ImageType = \
                                                 self.GENERATE_IMAGE_TYPE
 
-        self.shipment.RequestedShipment.LabelSpecification.LabelStockType = 'PAPER_7X4.75'
+        self.shipment.RequestedShipment.LabelSpecification.LabelStockType = 'STOCK_4X6'
         self.shipment.RequestedShipment.LabelSpecification.LabelPrintingOrientation = \
                                                 'BOTTOM_EDGE_OF_TEXT_FIRST'
 
@@ -179,18 +180,16 @@ class Shipment(Configuration):
         if self.shipment:
 
             # Writing label to pdf
-            out_path = self.label_path / f'{self.track_id}.{self.GENERATE_IMAGE_TYPE.lower()}'
+            self.shipping_label = self.label_path / f'{self.track_id}.{self.GENERATE_IMAGE_TYPE.lower()}'
             with open(out_path, 'wb') as f:
                 f.write(self.label_binary_data)
 
     def print_label(self):
 
         # Print Label to Serial Printer
-        if self.label_binary_data:
+        if self.shipping_label:
 
-            label_printer = serial.Serial(self.device)
-            label_printer.write(self.label_binary_data)
-            label_printer.close()
+            subprocess.run(["lp", "-o", "media=Custom.4x6in", self.shipping_label])
 
 
 if __name__ == '__main__':
