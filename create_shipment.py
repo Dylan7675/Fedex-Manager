@@ -181,7 +181,7 @@ class Shipment(Configuration):
 
             # Writing label to pdf
             self.shipping_label = self.label_path / f'{self.track_id}.{self.GENERATE_IMAGE_TYPE.lower()}'
-            with open(out_path, 'wb') as f:
+            with open(self.shipping_label, 'wb') as f:
                 f.write(self.label_binary_data)
 
     def print_label(self):
