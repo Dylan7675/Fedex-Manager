@@ -9,7 +9,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
-from PyQt5.QtWidgets import QWidget, QMainWindow, QMenuBar, QFormLayout, QLineEdit
+from PyQt5.QtWidgets import QWidget, QMainWindow, QMenuBar, \
+QFormLayout, QLineEdit, QMessageBox
 from PyQt5.Qt import *
 from pathlib import Path
 from label_format import Formatter
@@ -17,6 +18,7 @@ import pandas as pd
 import requests
 from create_shipment import Configuration, Shipment
 import json
+import glob
 
 
 class Ui_MainWindow(QMainWindow):
@@ -128,6 +130,7 @@ class Ui_MainWindow(QMainWindow):
         self.title_label.setStyleSheet("color: white;")
         self.setCentralWidget(self.centralwidget)
         self.config_dialog = ConfigMenu()
+        self.all_configs = []
 
         # Menu Bar
         self.menu_bar = self.menuBar()
@@ -138,6 +141,7 @@ class Ui_MainWindow(QMainWindow):
         self.load_config_option = self.config_menu.addMenu("Load Config")
         self.config_menu.addAction(self.new_config_option)
         self.config_menu.addMenu(self.load_config_option)
+        self.load_config_menu()
         # self.menu_bar.setNativeMenuBar(False)
 
         self.activated_widget = None
@@ -168,6 +172,7 @@ class Ui_MainWindow(QMainWindow):
 
         # Export Track Shipments Call
         self.tracking_button.clicked.connect(self.track_shipments_signal)
+
 
         self.retranslateUi()
         self.tabWidget.setCurrentIndex(0)
@@ -240,7 +245,7 @@ class Ui_MainWindow(QMainWindow):
         for key in recipient_dic.keys():
             try:
                 recipient = recipient_dic[key]
-                shipment = Shipment(recipient)
+                shipment = Shipment(self.config, recipient)
                 shipment.create_shipment()
                 shipment.label_2pdf()
                 shipment.print_label()
@@ -267,7 +272,8 @@ class Ui_MainWindow(QMainWindow):
         self.total_label.repaint()
 
     def config_window(self):
-        self.config_dialog.show()
+        self.config = self.config_dialog.show()
+        self.load_config_menu()
 
     def keyPressEvent(self, e):
         """ Copy Event """
@@ -287,6 +293,18 @@ class Ui_MainWindow(QMainWindow):
                     self.clip.setText(s)
         if e.key() == QtCore.Qt.Key_F5:
             self.close()
+
+    def load_config_menu(self):
+        for file in sorted(glob.glob('*.json')):
+            config_name = file.split(".")[0]
+            if config_name not in self.all_configs:
+                self.all_configs.append(config_name)
+                config_menu_item = QtWidgets.QAction(config_name, self)
+                self.load_config_option.addAction(config_menu_item)
+                config_menu_item.triggered.connect(lambda state, config=file: self.set_config_path(config))
+
+    def set_config_path(self, file):
+        self.config = Configuration(file)
 
     def active_widget(self):
         self.activated_widget = self.sender()
@@ -369,8 +387,6 @@ class ConfigMenu(QMainWindow):
                     self.flo.itemAt(row, 1).widget().setText("*Required")
                     self.flo.itemAt(row, 1).widget().repaint()
 
-        # Test Account Credentials via Fedex API
-
         if submission_valid:
 
             config_dic ={
@@ -395,14 +411,26 @@ class ConfigMenu(QMainWindow):
                    }
                   }
 
+            # Testing account credentials
+            try:
+                new_config = Configuration(config_dic)
+            except Exception as e:
+                msg = QMessageBox()
+                msg.setWindowTitle("Invalid Info!")
+                msg.setText("Invalid Account Credentials! Please confirm.")
+                msg.setIcon(QMessageBox.Critical)
+                msg.setStandardButtons(QMessageBox.Close)
+                msg.exec_()
+                return
+
             config_path = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',
                                             "shipper_config", "JSON file (*.json)")[0]
 
             with open(config_path, "w") as outfile:
                 json.dump(config_dic, outfile, indent = 2)
 
-            # Load new configuration
-
+            # Returns the newley activated Config
+            return new_config
 
 if __name__ == "__main__":
     import sys
