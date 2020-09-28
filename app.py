@@ -16,6 +16,7 @@ from label_format import Formatter
 import pandas as pd
 import requests
 from create_shipment import Configuration, Shipment
+import json
 
 
 class Ui_MainWindow(QMainWindow):
@@ -230,6 +231,7 @@ class Ui_MainWindow(QMainWindow):
 
         self.print_button.blockSignals(True)
         self.log_box.setText("Printing Labels...")
+        self.log_box.repaint()
 
         recipient_dic = pd.DataFrame(data=self.df_array,
                                  columns=[col for col in
@@ -262,6 +264,7 @@ class Ui_MainWindow(QMainWindow):
         tracking_percent = (index/len(self.tracking_list))*100
         self.tracking_progressBar.setValue(tracking_percent)
         self.total_label.setText(f"Total Tracked: {index}")
+        self.total_label.repaint()
 
     def config_window(self):
         self.config_dialog.show()
@@ -307,7 +310,6 @@ class ConfigMenu(QMainWindow):
     def __init__(self):
         super().__init__()
 
-
         wid = QtWidgets.QWidget(self)
         self.setCentralWidget(wid)
         self.setWindowTitle("New Config")
@@ -321,8 +323,12 @@ class ConfigMenu(QMainWindow):
         self.add2 = QLineEdit()
         self.city = QLineEdit()
         self.state = QLineEdit()
+        self.state.setMaxLength(2)
         self.zip = QLineEdit()
+        self.zip.setMaxLength(5)
         self.country = QLineEdit()
+        self.country.setText('US')
+        self.country.setReadOnly(True)
         self.phone = QLineEdit()
         self.ref = QLineEdit()
         self.key = QLineEdit()
@@ -334,16 +340,15 @@ class ConfigMenu(QMainWindow):
         self.flo.addRow("Address 1", self.add1)
         self.flo.addRow("Address 2", self.add2)
         self.flo.addRow("City", self.city)
-        self.flo.addRow("State", self.state)
+        self.flo.addRow("State Code", self.state)
         self.flo.addRow("Zip Code", self.zip)
-        self.flo.addRow("Country", self.country)
+        self.flo.addRow("Country Code", self.country)
         self.flo.addRow("Phone Number", self.phone)
         self.flo.addRow("Cost Center/Ref", self.ref)
         self.flo.addRow("Fedex Account Key", self.key)
         self.flo.addRow("Fedex Password", self.password)
         self.flo.addRow("Fedex Account Number", self.account)
         self.flo.addRow("Fedex Meter Number", self.meter)
-
 
         self.save_button = QtWidgets.QPushButton(self)
         self.save_button.setGeometry(QtCore.QRect(202, 415, 120, 25))
@@ -353,18 +358,51 @@ class ConfigMenu(QMainWindow):
         self.flo.setLabelAlignment(Qt.AlignLeft)
         wid.setLayout(self.flo)
 
-        def save_config(self):
-            print("Save Button")
+    def save_config(self):
+        submission_valid = True
 
-            # Validate user submission
+        for row in range(self.flo.rowCount()):
+            if not row == 2: # Excludes Optional Address 2 line
+                if (self.flo.itemAt(row, 1).widget().text() == "" or
+                        self.flo.itemAt(row, 1).widget().text() == "*Required"):
+                    submission_valid = False
+                    self.flo.itemAt(row, 1).widget().setText("*Required")
+                    self.flo.itemAt(row, 1).widget().repaint()
 
-            # if submissions_valid:
+        # Test Account Credentials via Fedex API
 
-                # Create nested dictionary of config values > Keys["Account", "Shipper"]
+        if submission_valid:
 
-                # Export dic as json file.
+            config_dic ={
+                  "Account":
+                  {
+                      "key": self.key.text(),
+                      "password": self.password.text(),
+                      "number": self.account.text(),
+                      "meter": self.meter.text()
+                  } ,
+                  "Shipper":
+                  {
+                      "Name": self.name.text(),
+                      "Address1": self.add1.text(),
+                      "Address2": self.add2.text(),
+                      "City": self.city.text(),
+                      "State": self.state.text().upper(),
+                      "Zip": self.zip.text(),
+                      "CountryCode": self.country.text(),
+                      "Phone": self.phone.text(),
+                      "CostCenter": self.ref.text()
+                   }
+                  }
 
-                # Allow user to name config file
+            config_path = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',
+                                            "shipper_config", "JSON file (*.json)")[0]
+
+            with open(config_path, "w") as outfile:
+                json.dump(config_dic, outfile, indent = 2)
+
+            # Load new configuration
+
 
 if __name__ == "__main__":
     import sys
