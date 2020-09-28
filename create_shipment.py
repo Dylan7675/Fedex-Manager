@@ -2,6 +2,7 @@ import fedex
 from fedex.config import FedexConfig
 from fedex.services.track_service import FedexTrackRequest
 from fedex.services.ship_service import FedexProcessShipmentRequest
+from fedex.base_service import FedexError
 import json
 import datetime
 import binascii
@@ -15,24 +16,16 @@ import subprocess
 
 class Configuration:
 
-    def __init__(self):
+    def __init__(self, file):
+        self.config_file = file
 
-        with open("config.json") as f:
-            config = json.load(f)
+        self.load_config()
+        try:
+            assert self.test_config()
+        except AssertionError:
+            return False
 
-        self.CONFIG_OBJ = FedexConfig(key=config['Account']['key'],
-                                 password=config['Account']['password'],
-                                 account_number=config['Account']['number'],
-                                 meter_number=config['Account']['meter'],
-                                 use_test_server=True)
-
-        self.shipper_data = config['Shipper']
-
-        # Printer Config
-        ports = list(serial.tools.list_ports.comports())
-        for p in ports:
-            if "printer" in p.description or "USB-Serial" in p.description:
-                self.device = p.device
+        self.shipper_data = self.config['Shipper']
 
         # Label path
         self.label_path = Path.cwd() / "labels"
@@ -44,13 +37,40 @@ class Configuration:
             except ValueError:
                 print(ValueError)
 
-        #self.baud = '9600'
+    def load_config(self):
 
-class Shipment(Configuration):
+        if isinstance(self.config_file, str):
+            with open(self.config_file) as f:
+                self.config = json.load(f)
+        elif isinstance(self.config_file, dict):
+            self.config = self.config_file
 
-    def __init__(self, recipient_data: Dict):
+        self.CONFIG_OBJ = FedexConfig(key=self.config['Account']['key'],
+                                 password=self.config['Account']['password'],
+                                 account_number=self.config['Account']['number'],
+                                 meter_number=self.config['Account']['meter'],
+                                 use_test_server=True)
 
-        Configuration.__init__(self)
+    def test_config(self):
+
+        # Test if account creds can access Fedex... until I can find a better way
+        try:
+            track = FedexTrackRequest(self.CONFIG_OBJ)
+            track.SelectionDetails.PackageIdentifier.Type = 'TRACKING_NUMBER_OR_DOORTAG'
+            track.SelectionDetails.PackageIdentifier.Value = '770432568567'
+            track.send_request()
+        except FedexError:
+            return False
+
+        return True
+
+class Shipment:
+
+    def __init__(self, config, recipient_data: Dict):
+
+        self.label_path = config.label_path
+        self.shipper_data = config.shipper_data
+        self.CONFIG_OBJ = config.CONFIG_OBJ
         self.recipient_data = recipient_data
         self.GENERATE_IMAGE_TYPE = 'PDF'
         self.label_binary_data = None
