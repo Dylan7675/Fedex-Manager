@@ -17,6 +17,7 @@ from label_format import Formatter
 import pandas as pd
 import requests
 from create_shipment import Configuration, Shipment
+from fedex_track import Tracker
 import json
 import glob
 
@@ -142,13 +143,11 @@ class Ui_MainWindow(QMainWindow):
         self.config_menu.addAction(self.new_config_option)
         self.config_menu.addMenu(self.load_config_option)
         self.load_config_menu()
-        # self.menu_bar.setNativeMenuBar(False)
 
         self.activated_widget = None
 
         # Initializing tracking lists
         self.tracking_list = []
-        self.tracking_status_list = []
 
         # Initializing clipboard
         self.clip = QtWidgets.QApplication.clipboard()
@@ -159,6 +158,9 @@ class Ui_MainWindow(QMainWindow):
         # Table Changed Signal Call
         self.label_table.itemChanged.connect(self.edit_label_table_dataset)
         self.label_table.itemEntered.connect(self.active_widget)
+
+        # Tracking Table Active Signal
+        self.tracking_table.itemEntered.connect(self.active_widget)
 
         # Export File Signal Call
         self.export_button.clicked.connect(self.active_widget)
@@ -172,7 +174,6 @@ class Ui_MainWindow(QMainWindow):
 
         # Export Track Shipments Call
         self.tracking_button.clicked.connect(self.track_shipments_signal)
-
 
         self.retranslateUi()
         self.tabWidget.setCurrentIndex(0)
@@ -202,18 +203,35 @@ class Ui_MainWindow(QMainWindow):
             except Exception as e:
                 self.log_box.setText(f"Incompatible data!\n\nPlease verify the import data.")
 
-
     def track_shipments_signal(self):
-        print("track signal call")
-        #self.tracking_list = self.tracking_input_box.getText().split(",")
 
-        #if self.tracking_list:
-            #for index, tracking_number in enumerate(self.tracking_list, 1)
-                #self.tracking_status_list.append(Tracker.track(tracking_number))
-                #self.update_progressbar(index)
+        tracking_status_list = []
 
-            #update tracking table: Col 0 - Tracking Number ; Col 1 - Tracking Status
+        # Parse Tracking numbers
+        tracking_input = self.tracking_input_box.toPlainText()
 
+        if "," in tracking_input:
+            self.tracking_list = tracking_input.strip().split(",\n")
+            if self.tracking_list[-1][-1] == ",":
+                self.tracking_list[-1] = self.tracking_list[-1].rstrip(",")
+        else:
+            self.tracking_list = tracking_input.strip().split("\n")
+
+        if self.tracking_list != ['']:
+            for index, tracking_number in enumerate(self.tracking_list, 1):
+                tracking_status_list.append(Tracker.track(tracking_number))
+                self.update_progressbar(index)
+
+        # Load tracking data to table
+        tracking_df = pd.DataFrame(list(zip(self.tracking_list,
+                                    tracking_status_list)))
+        tracking_array = tracking_df.values
+        self.tracking_table.setRowCount(tracking_df.shape[0])
+
+        for row in range(tracking_df.shape[0]):
+            for col in range(tracking_df.shape[1]):
+                self.tracking_table.setItem(row, col,
+                        QtWidgets.QTableWidgetItem(str(tracking_array[row, col])))
 
     def update_label_table(self):
         """ Updates the label table with data from df """
@@ -223,7 +241,8 @@ class Ui_MainWindow(QMainWindow):
         self.label_table.setRowCount(self.import_df.shape[0])
         for row in range(self.import_df.shape[0]):
             for col in range(self.import_df.shape[1]):
-                self.label_table.setItem(row, col, QtWidgets.QTableWidgetItem(str(self.df_array[row, col])))
+                self.label_table.setItem(row, col,
+                        QtWidgets.QTableWidgetItem(str(self.df_array[row, col])))
         self.label_table.blockSignals(False)
 
     def edit_label_table_dataset(self, item):
@@ -269,7 +288,6 @@ class Ui_MainWindow(QMainWindow):
         tracking_percent = (index/len(self.tracking_list))*100
         self.tracking_progressBar.setValue(tracking_percent)
         self.total_label.setText(f"Total Tracked: {index}")
-        self.total_label.repaint()
 
     def config_window(self):
         self.config = self.config_dialog.show()

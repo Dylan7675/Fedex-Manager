@@ -4,7 +4,7 @@ import sys
 
 class Tracker:
 
-    def track(self, tracking_number):
+    def track(tracking_number):
         """
         Input: Tracking Number
         Output: Returns tracking status
