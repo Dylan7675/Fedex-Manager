@@ -35,8 +35,7 @@ This section will cover how to use the available tools within this program. Curr
 
 To use the tracking functionality, paste your list of tracking numbers either space(enter) or comma(,) seperated in the Tracking Numbers box. Press the "Track Shipments" button and it will begin processing your request. Once it completes tracking your shipments, it will update the table to the right with the tracking statuses. You are able to copy the data directly out of this table. Please note, the speed of the tracking request is determined by the quantity of tracking numbers submitted.
 
-![Tracking Image]
-(https://imgur.com/JInTUXO.png)
+<img src="https://imgur.com/JInTUXO.png">
 
 ### Batch Labels
 As mentioned earlier, there are currently two methods to prepare batch labels. Batch labels can be prepared either via Exporting a csv file to be uploaded to Fedex ShipManager or by directly creating and printing the labels via the Fedex API. If you would like to create labels via the API, account credentials will need to be loaded into the tool.(Directions below.) Either way you decide, both methods start with the same process.
