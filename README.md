@@ -47,15 +47,13 @@ First start by preparing a csv file with the following data(no headers):
 - Col3: Recipient Address
 - Col4: Recipient Phone Number
 
-![csv data]
-(https://imgur.com/bYKTNMt.png)
+<img src="https://imgur.com/bYKTNMt.png">
 
 Once the csv has been prepared, use the "Browse" button to open the file and Parse the recipient addresses. After the addresses have been parsed, the recipient table will be updated. You can make edits in the table in case of minor errors while parsing.
 
 After your recipient data has been confirmed, you can proceed to export the table as a csv or directly print with a USB Label Printer(In my case, a Zebra label printer).
 
-![Print Export]
-(https://imgur.com/TDarkHh.png)
+<img src="https://imgur.com/TDarkHh.png">
 
 ### Configuration Loader
 The Configuration loader is used to create a shipper profile with your Shipper Address and Fedex API credentials. For further steps enabling API access for you account, please visit https://www.fedex.com/en-us/developer/web-services.html
@@ -65,8 +63,7 @@ To access the config loader, there is a config tool listed on the toolbar for th
 #### New Config
 To create a new config, select Config > New Config. Complete all fields to submit your Shipper Address and Account Credentials. Save the new configuration you have just created. It will check your connection to Fedex to confirm your account credentials are accurate.
 
-![New Config]
-(https://imgur.com/pxtg2i6.png)
+<img src="https://imgur.com/pxtg2i6.png">
 
 #### Load Config
 You can load a configuration for a shipper config you have already created. Config > Load Config will have a list of available configs you can select from.
