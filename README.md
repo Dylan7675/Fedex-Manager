@@ -28,6 +28,18 @@ From the repository, run app.py
 python app.py
 ```
 
+If you run into any issues with not having pyqt installed on your system.... please run:
+
+For Linux
+```
+sudo apt-get install python3-pyqt5 
+```
+
+For MacOS
+```
+brew install pyqt
+```
+
 ## Shipping Tools
 This section will cover how to use the available tools within this program. Currently there are two ways to create batch shipping labels within the program. You can either export the processed recipient data as a csv file or directly preparing the labels via the Fedex API and printing them to a USB printer.(Fedex API configuration credentials required. Directions listed below.)
 
