@@ -48,8 +48,7 @@ class Configuration:
         self.CONFIG_OBJ = FedexConfig(key=self.config['Account']['key'],
                                  password=self.config['Account']['password'],
                                  account_number=self.config['Account']['number'],
-                                 meter_number=self.config['Account']['meter'],
-                                 use_test_server=True)
+                                 meter_number=self.config['Account']['meter'])
 
     def test_config(self):
 
