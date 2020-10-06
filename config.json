@@ -1,0 +1,21 @@
+{
+  "Account":
+  {
+      "key": "eVGwj7xwE3VVGEHS",
+      "password": "mrZbl4Sa3KW1Bpo78SARvupg4",
+      "number": "510087240",
+      "meter": "114101339"
+  } ,
+  "Shipper":
+  {
+      "Name": "Droid Counter",
+      "Address1": "1625 Plymouth st.",
+      "Address2": "",
+      "City": "Mountain View",
+      "State": "CA",
+      "Zip": "94043",
+      "CountryCode": "US",
+      "Phone": "6502530000",
+      "CostCenter": "7D4"
+  }
+}

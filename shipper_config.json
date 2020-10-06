@@ -1,0 +1,19 @@
+{
+  "Account": {
+    "key": "asdfasdfafdd",
+    "password": "123123534df",
+    "number": "dfsdvsdfg34",
+    "meter": "dsdgfassdfg4"
+  },
+  "Shipper": {
+    "Name": "Dylan",
+    "Address1": "1123",
+    "Address2": "1243",
+    "City": "Palm Bay",
+    "State": "FL",
+    "Zip": "32907",
+    "CountryCode": "US",
+    "Phone": "3215064710",
+    "CostCenter": "7d4"
+  }
+}
