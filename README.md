@@ -16,7 +16,7 @@ cd Fedex-Manager
 Install the required dependencies:
 
 ````
-pip install -r requirements.txt
+pip install -r requirements.txt --user
 ````
 **Important**: Depending on your system, make sure to use pip3 and python3 instead.
 
@@ -32,7 +32,7 @@ If you run into any issues with not having pyqt installed on your system.... ple
 
 For Linux
 ```
-sudo apt-get install python3-pyqt5 
+sudo apt-get install python3-pyqt5
 ```
 
 For MacOS
