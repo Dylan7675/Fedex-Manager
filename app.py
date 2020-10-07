@@ -201,7 +201,8 @@ class Ui_MainWindow(QMainWindow):
                     self.log_box.setText("".join(self.data_import.logs))
 
             except Exception as e:
-                self.log_box.setText(f"Incompatible data!\n\nPlease verify the import data.")
+                #self.log_box.setText(f"Incompatible data!\n\nPlease verify the import data.")
+                self.log_box.setText(f'{e}')
 
     def track_shipments_signal(self):
 
